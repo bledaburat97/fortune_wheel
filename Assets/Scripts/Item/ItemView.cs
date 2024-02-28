@@ -14,6 +14,7 @@ public class ItemView : MonoBehaviour, IItemView
         transform.localScale = Vector3.one;
     }
     
+    //Set Image size according to width/height ratio of the icon.
     public virtual void SetImage(Sprite sprite)
     {
         image.sprite = sprite;

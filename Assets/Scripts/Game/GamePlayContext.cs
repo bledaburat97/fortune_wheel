@@ -24,14 +24,14 @@ public class GamePlayContext : MonoBehaviour
         wheelController.Initialize(wheelView, _itemTypeToIconDict);
         IZoneNumberController zoneNumberController = new ZoneNumberController();
         zoneNumberController.Initialize();
-        IGameController gameController = new GameController();
-        gameController.Initialize(inventory, wheelController, giftItemDeterminer, zoneNumberController);
         ISpinButtonController spinButtonController = new SpinButtonController();
-        spinButtonController.Initialize(spinButtonView, gameController);
-        IPopupHolderController popupHolderController = new PopupHolderController();
-        popupHolderController.Initialize(popupHolderView, gameController, inventory);
+        spinButtonController.Initialize(spinButtonView);
         IExitButtonController exitButtonController = new ExitButtonController();
         exitButtonController.Initialize(exitButtonView, zoneNumberController, wheelController, inventory);
+        IGameController gameController = new GameController();
+        gameController.Initialize(inventory, wheelController, giftItemDeterminer, zoneNumberController, spinButtonController);
+        IPopupHolderController popupHolderController = new PopupHolderController();
+        popupHolderController.Initialize(popupHolderView, gameController, inventory);
     }
 }
 

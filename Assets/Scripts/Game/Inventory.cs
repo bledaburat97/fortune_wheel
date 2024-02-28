@@ -3,10 +3,13 @@ using UnityEngine;
 
 public class Inventory : IInventory
 {
-    private Dictionary<ItemType, int> _inventoryItemAmountDict = new Dictionary<ItemType, int>();
-    private Dictionary<ItemType, IInventoryItemView> _inventoryItemDict = new Dictionary<ItemType, IInventoryItemView>();
     private IInventoryView _view;
-    private Dictionary<ItemType, Sprite> _itemTypeToIconDict;
+    private Dictionary<ItemType, int> _itemTypeToAmountDict = new Dictionary<ItemType, int>();
+
+    private Dictionary<ItemType, IInventoryItemView> _itemTypeToItemViewDict =
+        new Dictionary<ItemType, IInventoryItemView>();
+
+    private Dictionary<ItemType, Sprite> _itemTypeToIconDict = new Dictionary<ItemType, Sprite>();
 
     public void Initialize(IInventoryView view, Dictionary<ItemType, Sprite> itemTypeToIconDict)
     {
@@ -16,47 +19,54 @@ public class Inventory : IInventory
 
     public void AddItem(Item item)
     {
-        if (_inventoryItemDict.ContainsKey(item.itemType))
+        if (_itemTypeToItemViewDict.ContainsKey(item.itemType))
         {
-            int prevAmount = _inventoryItemAmountDict[item.itemType];
+            int prevAmount = _itemTypeToAmountDict[item.itemType];
             int newAmount = prevAmount + item.amount;
-            _inventoryItemAmountDict[item.itemType] = newAmount;
-            _inventoryItemDict[item.itemType].SetText(newAmount);
+            _itemTypeToAmountDict[item.itemType] = newAmount;
+            _itemTypeToItemViewDict[item.itemType].SetText(newAmount);
         }
     }
 
     public void ClearInventory()
     {
-        foreach (var inventoryItemPair in _inventoryItemDict)
+        foreach (var inventoryItemPair in _itemTypeToItemViewDict)
         {
             inventoryItemPair.Value.Destroy();
         }
-        _inventoryItemAmountDict = new Dictionary<ItemType, int>();
-        _inventoryItemDict = new Dictionary<ItemType, IInventoryItemView>();
-        
+
+        _itemTypeToAmountDict.Clear();
+        _itemTypeToItemViewDict.Clear();
+
     }
 
     public void TryCreateItem(Item item)
     {
-        if (!_inventoryItemDict.ContainsKey(item.itemType))
+        if (!_itemTypeToItemViewDict.ContainsKey(item.itemType))
         {
             IInventoryItemView inventoryItemView = _view.CreateInventoryItem();
             inventoryItemView.Init();
             inventoryItemView.SetImage(_itemTypeToIconDict[item.itemType]);
             inventoryItemView.SetText(0);
-            _inventoryItemDict.Add(item.itemType, inventoryItemView);
-            _inventoryItemAmountDict.Add(item.itemType, 0);
+            _itemTypeToItemViewDict.Add(item.itemType, inventoryItemView);
+            _itemTypeToAmountDict.Add(item.itemType, 0);
         }
     }
 
     public IInventoryItemView GetInventoryItemView(ItemType itemType)
     {
-        return _inventoryItemDict[itemType];
+        if (_itemTypeToItemViewDict.TryGetValue(itemType, out var view))
+        {
+            return view;
+        }
+
+        Debug.LogError($"Item type {itemType} not found in inventory.");
+        return null;
     }
 
     public Dictionary<ItemType, int> GetItemAmountDictionary()
     {
-        return _inventoryItemAmountDict;
+        return _itemTypeToAmountDict;
     }
 }
 

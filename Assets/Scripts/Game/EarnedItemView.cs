@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+//It helps to scale up and fade the selected gift.
 public class EarnedItemView : MonoBehaviour
 {
     [SerializeField] private RectTransform rectTransform;

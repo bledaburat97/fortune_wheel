@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class PopupHolderView : MonoBehaviour, IPopupHolderView
 {
     [SerializeField] private BombPopupView bombPopupView;
-    private const int revivePrice = 25;
+    private const int RevivePrice = 25;
     public void OpenBombPopup(Action clearInventory, Action onCloseAction)
     {
         bombPopupView.gameObject.SetActive(true);
@@ -28,7 +28,7 @@ public class PopupHolderView : MonoBehaviour, IPopupHolderView
 
     private void ReviveWithGold(Action onCloseAction)
     {
-        if (AssetManager.Instance.TrySpendGold(revivePrice))
+        if (AssetManager.Instance.TrySpendGold(RevivePrice))
         {
             CloseBombPopup(onCloseAction);
         }

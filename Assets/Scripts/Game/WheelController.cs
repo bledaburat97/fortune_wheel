@@ -7,18 +7,39 @@ public class WheelController : IWheelController
 {
     private IWheelView _view;
     private bool _isSpinning;
-    private readonly float _sliceAngleInDegree = 360f / ConstantValues.NumberOfSlices;
-    private readonly float _sliceAngleInRadian = 2 * Mathf.PI / ConstantValues.NumberOfSlices;
+    private readonly float _sliceAngleInDegree;
+    private readonly float _sliceAngleInRadian;
     private const float SpinDuration = 5f;
     private Dictionary<ItemType, Sprite> _itemTypeToIconDict;
     private List<IGiftItemView> _giftItemViews = new List<IGiftItemView>();
     private const float distanceToCenterRatio = 0.3f;
     private const float giftItemSizeRatio = 0.13f;
+    private float _sizeOfWheel;
+    private Vector2 _centerOfWheel;
+    private float _distanceToCenter;
+    private const float WheelTitleMovementDuration = 0.5f;
+    private const float InnerImageScaleRatio = 0.7f;
+    private const float NumberOfLaps = 4;
+    
+    public WheelController()
+    {
+        _sliceAngleInDegree = 360f / ConstantValues.NumberOfSlices;
+        _sliceAngleInRadian = 2 * Mathf.PI / ConstantValues.NumberOfSlices;
+    }
+    
     public void Initialize(IWheelView view, Dictionary<ItemType, Sprite> itemTypeToIconDict)
     {
         _view = view;
         _itemTypeToIconDict = itemTypeToIconDict;
+        CalculateWheelProperties();
         CreateGiftObjects();
+    }
+    
+    private void CalculateWheelProperties()
+    {
+        _sizeOfWheel = _view.GetRectTransform().rect.width;
+        _centerOfWheel = new Vector2(0f, 0f);
+        _distanceToCenter = distanceToCenterRatio * _sizeOfWheel;
     }
 
     public bool IsSpinning()
@@ -32,8 +53,8 @@ public class WheelController : IWheelController
         {
             _isSpinning = true;
             float angle = -(_sliceAngleInDegree * index);
-            Vector3 targetRotation = Vector3.back * (angle + 2 * 360);
-            SendWheelTitleBack(0.5f);
+            Vector3 targetRotation = Vector3.back * (angle + NumberOfLaps * 360);
+            SendWheelTitleBack(WheelTitleMovementDuration);
             _view.GetRectTransform()
                 .DORotate(targetRotation, SpinDuration, RotateMode.FastBeyond360)
                 .SetEase(Ease.InOutQuart)
@@ -50,24 +71,15 @@ public class WheelController : IWheelController
         _view.SetStatusOfEarnedItemBg(true);
         _view.SetColorOfEarnedItemBg(itemType);
         float scaleRatio = _view.GetRectTransform().rect.width / _view.GetEarnedItemBg().rect.width;
-        float imageOwnScaleRatio = itemType == ItemType.Bomb ? 1f : 0.7f;
-        scaleRatioOfImage = scaleRatio * 0.7f;
+        float innerImageScaleRatio = itemType == ItemType.Bomb ? 1f : InnerImageScaleRatio;
+        scaleRatioOfImage = scaleRatio * InnerImageScaleRatio;
         return DOTween.Sequence().Append(_view.GetEarnedItemBg().DOScale(scaleRatio, duration))
-            .Join(giftItemView.GetRectTransform().DOScale(imageOwnScaleRatio, duration))
+            .Join(giftItemView.GetRectTransform().DOScale(innerImageScaleRatio, duration))
             .Join(_view.GetEarnedItemBg().DOLocalMove(_view.GetRectTransform().localPosition, duration));
-    }
-
-    public void UpdateWheel(ZoneType zoneType, List<Item> items)
-    {
-        _view.SetWheelImage(zoneType);
-        SetGiftImages(items);
     }
 
     public Sequence CloseEarnedItemBg(IGiftItemView giftItemView, float duration)
     {
-        float sizeOfWheel = _view.GetRectTransform().rect.width;
-        Vector2 centerOfWheel = new Vector2(0f, 0f);
-        float distanceToCenter = distanceToCenterRatio * sizeOfWheel;
         CanvasGroup earnedItemBgCanvasGroup = _view.GetEarnedItemBgCanvasGroup();
         RectTransform earnedItemBg = _view.GetEarnedItemBg();
         return DOTween.Sequence().Append(earnedItemBgCanvasGroup.DOFade(0f, duration))
@@ -77,12 +89,13 @@ public class WheelController : IWheelController
                 earnedItemBg.gameObject.SetActive(false);
                 earnedItemBg.localScale = Vector3.one;
                 earnedItemBg.localPosition =
-                    new Vector3(centerOfWheel.x, centerOfWheel.y + distanceToCenter);
+                    new Vector3(_centerOfWheel.x, _centerOfWheel.y + _distanceToCenter);
                 earnedItemBgCanvasGroup.alpha = 1f;
-                BringWheelTitle(0.5f);
+                BringWheelTitle(WheelTitleMovementDuration);
             });
     }
 
+    //Set icons of items on wheel.
     public void SetGiftImages(List<Item> items)
     {
         for (int i = 0; i < items.Count ; i++)
@@ -97,18 +110,16 @@ public class WheelController : IWheelController
         _view.SetWheelImage(zoneType);
     }
 
+    //Create item objects on wheel.
     private void CreateGiftObjects()
     {
-        float sizeOfWheel = _view.GetRectTransform().rect.width;
-        Vector2 centerOfWheel = new Vector2(0f, 0f);
-        float distanceToCenter = distanceToCenterRatio * sizeOfWheel;
-        float size = giftItemSizeRatio * sizeOfWheel;
+        float size = giftItemSizeRatio * _sizeOfWheel;
         for (int i = 0; i < ConstantValues.NumberOfSlices; i++)
         {
             float angle = i * _sliceAngleInRadian;
 
-            float posX = centerOfWheel.x + distanceToCenter * Mathf.Sin(angle);
-            float posY = centerOfWheel.y + distanceToCenter * Mathf.Cos(angle);
+            float posX = _centerOfWheel.x + _distanceToCenter * Mathf.Sin(angle);
+            float posY = _centerOfWheel.y + _distanceToCenter * Mathf.Cos(angle);
             IGiftItemView giftItemView = _view.CreateGiftObject();
             giftItemView.Init();
             giftItemView.SetSize(size);
@@ -117,7 +128,7 @@ public class WheelController : IWheelController
             _giftItemViews.Add(giftItemView);
         }
         
-        _view.InitEarnedItemBg(new Vector3(size,size, 0f), new Vector3(centerOfWheel.x, centerOfWheel.y + distanceToCenter, 0f));
+        _view.InitEarnedItemBg(new Vector3(size,size, 0f), new Vector3(_centerOfWheel.x, _centerOfWheel.y + _distanceToCenter, 0f));
     }
     
     public IGiftItemView DuplicateSelectedGiftObject(Item item)
@@ -155,6 +166,5 @@ public interface IWheelController
     IGiftItemView DuplicateSelectedGiftObject(Item item);
     Sequence ScaleUpEarnedItem(IGiftItemView giftItemView, float duration, ItemType itemType, out float scaleRatioOfImage);
     Sequence CloseEarnedItemBg(IGiftItemView giftItemView, float duration);
-    void UpdateWheel(ZoneType zoneType, List<Item> items);
     void BringWheelTitle(float duration);
 }

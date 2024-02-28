@@ -33,9 +33,9 @@ public class GiftItemDeterminer : IGiftItemDeterminer
         return _currentZoneItems;
     }
 
+    //A Bomb item must be added in standard zones.
     private void TryAddBombItem(ZoneType zoneType)
     {
-        //A Bomb item must be added in standard zones.
         if (zoneType == ZoneType.Standard)
         {
             _currentZoneItems.Add(new Item()
@@ -45,10 +45,10 @@ public class GiftItemDeterminer : IGiftItemDeterminer
             });
         }
     }
-
+    
+    //Add zone items until max number of slice items.
     private void TrySetZoneItemsFromEditor(int zoneIndex, ZoneType zoneType)
     {
-        //Add zone items until max number of slice items except bomb item.
         if (_zoneIndexToItems.TryGetValue(zoneIndex, out List<Item> items))
         {
             int i = 0;
@@ -60,9 +60,9 @@ public class GiftItemDeterminer : IGiftItemDeterminer
         }
     }
 
+    //Set missing items randomly and their amounts according to zoneIndex. (FOR TEST)
     private void SetMissingItemsOfZone(int zoneIndex)
     {
-        //Set missing items randomly and their amounts according to zoneIndex. (FOR TEST)
         int countOfItemTypes = _possibleItemTypes.Count;
         while (_currentZoneItems.Count < ConstantValues.NumberOfSlices)
         {
