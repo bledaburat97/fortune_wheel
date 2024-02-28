@@ -1233,57 +1233,69 @@ MonoBehaviour:
   - zoneIndex: 1
     items:
     - itemType: 0
-      amount: 20
+      amount: 200
     - itemType: 7
-      amount: 3
-    - itemType: 2
-      amount: 4
+      amount: 1
+    - itemType: 8
+      amount: 1
     - itemType: 1
-      amount: 5
-    - itemType: 1
-      amount: 6
-    - itemType: 5
       amount: 2
+    - itemType: 1
+      amount: 3
     - itemType: 0
-      amount: 70
+      amount: 300
+    - itemType: 1
+      amount: 1
     - itemType: 0
       amount: 80
   - zoneIndex: 2
     items:
     - itemType: 1
-      amount: 20
-    - itemType: 1
-      amount: 10
-    - itemType: 14
       amount: 1
-    - itemType: 14
+    - itemType: 1
       amount: 2
-    - itemType: 14
+    - itemType: 0
+      amount: 350
+    - itemType: 1
       amount: 3
-    - itemType: 7
-      amount: 5
+    - itemType: 12
+      amount: 2
     - itemType: 6
       amount: 1
-    - itemType: 14
-      amount: 1
-  - zoneIndex: 4
+    - itemType: 0
+      amount: 500
+  - zoneIndex: 3
     items:
     - itemType: 0
       amount: 100
-    - itemType: 14
-      amount: 1
-    - itemType: 14
-      amount: 2
-    - itemType: 14
-      amount: 3
-    - itemType: 2
-      amount: 2
     - itemType: 0
-      amount: 100
+      amount: 900
+    - itemType: 1
+      amount: 4
+    - itemType: 1
+      amount: 1
+    - itemType: 7
+      amount: 1
+    - itemType: 0
+      amount: 150
+    - itemType: 1
+      amount: 2
+  - zoneIndex: 4
+    items:
+    - itemType: 0
+      amount: 1000
+    - itemType: 0
+      amount: 800
+    - itemType: 1
+      amount: 4
+    - itemType: 1
+      amount: 6
     - itemType: 8
       amount: 1
-    - itemType: 12
-      amount: 2
+    - itemType: 0
+      amount: 150
+    - itemType: 1
+      amount: 5
   exitButtonView: {fileID: 907401783}
 --- !u!4 &811500798
 Transform:
